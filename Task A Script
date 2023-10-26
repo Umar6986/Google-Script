@@ -1,0 +1,23 @@
+function onEdit(e) {
+  var sheetIndexId = 0; 
+  var headers = [["", "SW. DATE","SW. TIME", "MACHINE"]];
+
+  var activeSheet = SpreadsheetApp. getActiveSpreadsheet(); 
+  var sheet = activeSheet.getSheets() [sheetIndexId];
+  var range = sheet.getRange("A1:D1");
+  range.setValues(headers).setFontWeight("bold")
+
+  var sheet = e.source.getActiveSheet();
+  var range = e.range;
+  if (sheet.getName() == "Sheet1" && range.getColumn() == 4) {
+    var row = range.getRow();
+    var date = new Date();
+    sheet.getRange(row, 1).setValue("1");
+    sheet.getRange(row, 2).setValue(date).setNumberFormat("MM/dd/yyyy");
+    sheet.getRange(row, 3).setValue(date).setNumberFormat("hh:mm:ss");
+    var lastRow = sheet.getLastRow();
+    var sumRange = sheet.getRange("A1:A" + lastRow);
+    var sumFormula = "=SUM(A1:A" + lastRow + ")";
+    sheet.getRange(lastRow + 1, 1).setValue(sumFormula);
+  }
+}
