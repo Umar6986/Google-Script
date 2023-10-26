@@ -1,0 +1,39 @@
+function onEdit(e) {
+  var sheetIndexId = 0;
+  var headers = [["SW. DATE", "SW. TIME", "SUM", "DIFF"]];
+
+  var activeSheet = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = activeSheet.getSheets()[sheetIndexId];
+  var range = sheet.getRange("A1:D1");
+  range.setValues(headers).setFontWeight("bold");
+
+  var sheetName = "Sheet1";
+  var diffColumnIndex = 3;
+
+  var sheet = e.source.getSheetByName(sheetName);
+  var range = e.range;
+
+  // Check if the edit was made in the correct sheet and column
+  if (sheet && range.getColumn() == diffColumnIndex) {
+    var row = range.getRow();
+    var date = new Date();
+    
+    // Set the date and time in the appropriate columns
+    sheet.getRange(row, 1).setValue(date).setNumberFormat("MM/dd/yyyy");
+    sheet.getRange(row, 2).setValue(date).setNumberFormat("hh:mm:ss");
+  
+    // Calculate the SUM
+    var lastRow = sheet.getLastRow();
+    var sumRange = sheet.getRange("C1:C" + lastRow);
+    var sumFormula = "=SUM(C1:C" + lastRow + ")";
+    sheet.getRange(lastRow + 1, diffColumnIndex).setValue(sumFormula);
+    
+    // Calculate the DIFF
+    if (lastRow > 1) {
+      var prevSum = sheet.getRange(lastRow - 1, diffColumnIndex).getValue();
+      var currentSum = sheet.getRange(lastRow, diffColumnIndex).getValue();
+      var diff = currentSum - prevSum;
+      sheet.getRange(lastRow, diffColumnIndex + 1).setValue(diff);
+    }
+  }
+}
